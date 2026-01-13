@@ -4,8 +4,8 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
 export default function FeaturesMarquee() {
-  const marqueeRow1Ref = useRef(null);
-  const marqueeRow2Ref = useRef(null);
+  const marqueeRow1Ref = useRef<HTMLDivElement | null>(null);
+  const marqueeRow2Ref = useRef<HTMLDivElement | null>(null);
 
   const featuresRow1 = [
     "Speech Recognition",
@@ -30,12 +30,16 @@ export default function FeaturesMarquee() {
   ];
 
   useEffect(() => {
-    // First row animation (left to right)
     const row1Container = marqueeRow1Ref.current;
+    const row2Container = marqueeRow2Ref.current;
+
+    if (!row1Container || !row2Container) return;
+
+    // First row animation (left to right)
     const row1Width = row1Container.scrollWidth / 2;
 
     const tl1 = gsap.timeline({ repeat: -1 });
-    tl1.fromTo(row1Container, 
+    tl1.fromTo(row1Container,
       { x: 0 },
       {
         x: -row1Width,
@@ -45,7 +49,6 @@ export default function FeaturesMarquee() {
     );
 
     // Second row animation (right to left - opposite direction)
-    const row2Container = marqueeRow2Ref.current;
     const row2Width = row2Container.scrollWidth / 2;
 
     const tl2 = gsap.timeline({ repeat: -1 });
@@ -60,13 +63,17 @@ export default function FeaturesMarquee() {
 
     // Hover pause functionality for row 1
     const row1Parent = row1Container.parentElement;
-    row1Parent.addEventListener('mouseenter', () => tl1.pause());
-    row1Parent.addEventListener('mouseleave', () => tl1.resume());
+    if (row1Parent) {
+      row1Parent.addEventListener('mouseenter', () => tl1.pause());
+      row1Parent.addEventListener('mouseleave', () => tl1.resume());
+    }
 
     // Hover pause functionality for row 2
     const row2Parent = row2Container.parentElement;
-    row2Parent.addEventListener('mouseenter', () => tl2.pause());
-    row2Parent.addEventListener('mouseleave', () => tl2.resume());
+    if (row2Parent) {
+      row2Parent.addEventListener('mouseenter', () => tl2.pause());
+      row2Parent.addEventListener('mouseleave', () => tl2.resume());
+    }
 
     return () => {
       tl1.kill();
