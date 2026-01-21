@@ -17,7 +17,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function FeaturesShowcase() {
   const sectionRef = useRef(null);
-  const cardsRef = useRef([]);
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   const features = [
     {
@@ -147,7 +147,7 @@ export default function FeaturesShowcase() {
             return (
               <motion.div
                 key={index}
-                ref={(el) => (cardsRef.current[index] = el)}
+                ref={(el) => { cardsRef.current[index] = el; }}
                 whileHover={{ y: -10 }}
                 className="group bg-slate-50 rounded-2xl p-8 border-2 border-slate-200 hover:border-sky-500 transition-all duration-300 cursor-pointer"
               >

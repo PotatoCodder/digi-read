@@ -6,7 +6,7 @@ import { gsap } from "gsap";
 import { Star, Quote, Users, TrendingUp, Award } from "lucide-react";
 
 export default function TestimonialsSection() {
-  const statsRef = useRef([]);
+  const statsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   const testimonials = [
     {
@@ -103,7 +103,7 @@ export default function TestimonialsSection() {
             return (
               <motion.div
                 key={index}
-                ref={(el) => (statsRef.current[index] = el)}
+                ref={(el) => { statsRef.current[index] = el; }}
                 whileHover={{ scale: 1.05 }}
                 className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 text-center"
               >
