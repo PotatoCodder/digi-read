@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
-import { Star, Quote, Users, TrendingUp, Award } from "lucide-react";
+import { IoStar, IoChatbubble, IoPeople, IoTrendingUp, IoTrophy } from "react-icons/io5";
 
 export default function TestimonialsSection() {
   const statsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -36,10 +36,10 @@ export default function TestimonialsSection() {
   ];
 
   const stats = [
-    { value: "10K+", label: "Active Teachers", icon: Users },
-    { value: "250K+", label: "Students Helped", icon: TrendingUp },
-    { value: "98%", label: "Satisfaction Rate", icon: Award },
-    { value: "45%", label: "Average Improvement", icon: Star }
+    { value: "10K+", label: "Active Teachers", icon: IoPeople },
+    { value: "250K+", label: "Students Helped", icon: IoTrendingUp },
+    { value: "98%", label: "Satisfaction Rate", icon: IoTrophy },
+    { value: "45%", label: "Average Improvement", icon: IoStar }
   ];
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export default function TestimonialsSection() {
             className="inline-block mb-4"
           >
             <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-sky-500 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
-              <Quote className="w-8 h-8 text-white" />
+              <IoChatbubble className="w-8 h-8 text-white" />
             </div>
           </motion.div>
           
@@ -131,13 +131,13 @@ export default function TestimonialsSection() {
             >
               {/* Quote Icon */}
               <div className="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center mb-4">
-                <Quote className="w-6 h-6 text-sky-500" />
+                <IoChatbubble className="w-6 h-6 text-sky-500" />
               </div>
 
               {/* Rating */}
               <div className="flex gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star
+                  <IoStar
                     key={i}
                     className="w-5 h-5 fill-yellow-400 text-yellow-400"
                   />

@@ -4,14 +4,14 @@ import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { 
-  Brain, 
-  Zap, 
-  Target, 
-  LineChart, 
-  Shield, 
-  Sparkles 
-} from "lucide-react";
+import {
+  IoHardwareChip,
+  IoFlash,
+  IoEye,
+  IoBarChart,
+  IoShield,
+  IoSparkles
+} from "react-icons/io5";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,42 +21,42 @@ export default function FeaturesShowcase() {
 
   const features = [
     {
-      icon: Brain,
+      icon: IoHardwareChip,
       title: "AI-Powered Analysis",
       description: "Advanced algorithms detect reading patterns and provide personalized feedback in real-time.",
       color: "sky",
       gradient: "from-sky-500 to-blue-600"
     },
     {
-      icon: Zap,
+      icon: IoFlash,
       title: "Instant Feedback",
       description: "Get immediate insights on pronunciation, fluency, and comprehension as students read.",
       color: "yellow",
       gradient: "from-yellow-500 to-orange-600"
     },
     {
-      icon: Target,
+      icon: IoEye,
       title: "Precision Tracking",
       description: "Track every word, syllable, and pause with syllable-level accuracy for detailed analysis.",
       color: "emerald",
       gradient: "from-emerald-500 to-green-600"
     },
     {
-      icon: LineChart,
+      icon: IoBarChart,
       title: "Progress Insights",
       description: "Visualize student growth over time with comprehensive reports and actionable data.",
       color: "purple",
       gradient: "from-purple-500 to-pink-600"
     },
     {
-      icon: Shield,
+      icon: IoShield,
       title: "Secure & Private",
       description: "Student data is encrypted and protected with enterprise-grade security standards.",
       color: "indigo",
       gradient: "from-indigo-500 to-blue-600"
     },
     {
-      icon: Sparkles,
+      icon: IoSparkles,
       title: "Engaging Experience",
       description: "Gamified elements and interactive features keep students motivated and excited to read.",
       color: "rose",
@@ -123,7 +123,7 @@ export default function FeaturesShowcase() {
             className="inline-block mb-4"
           >
             <div className="w-16 h-16 bg-gradient-to-br from-sky-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
-              <Sparkles className="w-8 h-8 text-white" />
+              <IoSparkles className="w-8 h-8 text-white" />
             </div>
           </motion.div>
           

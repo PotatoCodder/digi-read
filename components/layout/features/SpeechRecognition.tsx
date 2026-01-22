@@ -6,7 +6,7 @@ import SpeechRecognition, {
 } from "react-speech-recognition";
 import { motion, AnimatePresence } from "framer-motion";
 import { gsap } from "gsap";
-import { Mic, Square } from "lucide-react";
+import { IoMic, IoSquare } from "react-icons/io5";
 
 const passage = `There are rocks in our Solar System that never flocked together to form planets. Larger ones called asteroids gather in the Asteroid Belt`;
 
@@ -159,7 +159,7 @@ export default function RealtimeReadingTracker() {
                 onClick={start}
                 className="flex items-center justify-center gap-2 px-8 py-3 bg-sky-500 text-white font-medium rounded-lg hover:bg-sky-600 transition-colors"
               >
-                <Mic className="w-5 h-5" />
+                <IoMic className="w-5 h-5" />
                 Start Reading
               </motion.button>
             ) : (
@@ -168,7 +168,7 @@ export default function RealtimeReadingTracker() {
                 onClick={stop}
                 className="flex items-center justify-center gap-2 px-8 py-3 bg-slate-200 text-slate-700 font-medium rounded-lg hover:bg-slate-300 transition-colors"
               >
-                <Square className="w-5 h-5" />
+                <IoSquare className="w-5 h-5" />
                 Stop
               </motion.button>
             )}

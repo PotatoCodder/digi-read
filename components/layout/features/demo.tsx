@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { IoArrowForward, IoCheckmarkCircle } from "react-icons/io5";
 import Link from "next/link";
 
 export default function DemoFeature() {
@@ -191,7 +191,7 @@ export default function DemoFeature() {
                   transition={{ delay: index * 0.1 }}
                   className="flex items-center gap-3"
                 >
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                  <IoCheckmarkCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
                   <span className="text-slate-700">{feature}</span>
                 </motion.div>
               ))}
@@ -205,7 +205,7 @@ export default function DemoFeature() {
                 className="flex items-center gap-2 px-6 py-3 bg-sky-500 text-white font-semibold rounded-lg hover:bg-sky-600 transition-colors"
               >
                 <Link href="/read">Try It Free</Link>
-                <ArrowRight className="w-5 h-5" />
+                <IoArrowForward className="w-5 h-5" />
               </motion.button>
               
               <motion.button
