@@ -1,17 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 import { motion, AnimatePresence } from "framer-motion";
 import { gsap } from "gsap";
-import { IoMic, IoSquare, IoWarning } from "react-icons/io5";
+import { IoMic, IoSquare } from "react-icons/io5";
 
 const passage = `There are rocks in our Solar System that never flocked together to form planets. Larger ones called asteroids gather in the Asteroid Belt`;
 
 export default function RealtimeReadingTracker() {
+  const { transcript, listening, resetTranscript } = useSpeechRecognition();
   const containerRef = useRef(null);
   const progressBarRef = useRef(null);
-  const recognitionRef = useRef<any>(null);
-  
+
   const words = useMemo(
     () => passage.toLowerCase().replace(/[^\w\s]/g, "").split(" "),
     []
@@ -19,20 +22,6 @@ export default function RealtimeReadingTracker() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [accuracy, setAccuracy] = useState(0);
-  const [listening, setListening] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const [interimTranscript, setInterimTranscript] = useState("");
-  const [error, setError] = useState("");
-  const [isSupported, setIsSupported] = useState(true);
-
-  // Check browser support
-  useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      setIsSupported(false);
-      setError("Speech recognition is not supported. Please use Chrome, Edge, or Safari.");
-    }
-  }, []);
 
   // GSAP entrance animation
   useEffect(() => {
@@ -45,51 +34,29 @@ export default function RealtimeReadingTracker() {
     }
   }, []);
 
-  // Real-time tracking with improved accuracy
+  // Real-time tracking
   useEffect(() => {
-    const fullText = transcript + " " + interimTranscript;
-    const spokenWords = fullText
+    const spokenWords = transcript
       .toLowerCase()
       .replace(/[^\w\s]/g, "")
       .split(" ")
       .filter(Boolean);
 
-    setCurrentIndex(Math.min(spokenWords.length, words.length));
+    setCurrentIndex(spokenWords.length);
 
-    // Enhanced accuracy calculation
+    // Calculate accuracy
     if (spokenWords.length > 0) {
-      let correctWords = 0;
-      let totalChecked = Math.min(spokenWords.length, words.length);
-      
-      for (let i = 0; i < totalChecked; i++) {
-        const spoken = spokenWords[i];
-        const expected = words[i];
-        
-        // Exact match
-        if (spoken === expected) {
-          correctWords++;
-        } 
-        // Partial match (handles pronunciation variations)
-        else if (spoken.length > 2 && expected.length > 2) {
-          if (spoken.includes(expected) || expected.includes(spoken)) {
-            correctWords += 0.7;
-          } else if (
-            spoken.substring(0, 3) === expected.substring(0, 3) ||
-            spoken.substring(0, 2) === expected.substring(0, 2)
-          ) {
-            correctWords += 0.5;
-          }
-        }
-      }
-      
-      setAccuracy(Math.round((correctWords / totalChecked) * 100));
+      const correctWords = spokenWords.filter(
+        (word, i) => word === words[i]
+      ).length;
+      setAccuracy(Math.round((correctWords / spokenWords.length) * 100));
     }
-  }, [transcript, interimTranscript, words]);
+  }, [transcript, words]);
 
   // Animate progress bar
   useEffect(() => {
     if (progressBarRef.current) {
-      const progress = Math.min((currentIndex / words.length) * 100, 100);
+      const progress = (currentIndex / words.length) * 100;
       gsap.to(progressBarRef.current, {
         width: `${progress}%`,
         duration: 0.3,
@@ -98,149 +65,22 @@ export default function RealtimeReadingTracker() {
     }
   }, [currentIndex, words.length]);
 
-  // Initialize speech recognition with optimal settings
-  const initRecognition = useCallback(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) return null;
-
-    const recognition = new SpeechRecognition();
-    
-    // Optimized settings for accuracy and mobile performance
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
-    recognition.maxAlternatives = 1;
-    
-    recognition.onstart = () => {
-      setListening(true);
-      setError("");
-    };
-
-    recognition.onresult = (event) => {
-      let interim = "";
-      let final = "";
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcriptPiece = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          final += transcriptPiece + " ";
-        } else {
-          interim += transcriptPiece;
-        }
-      }
-
-      if (final) {
-        setTranscript((prev) => prev + final);
-      }
-      setInterimTranscript(interim);
-    };
-
-    recognition.onerror = (event) => {
-      console.error("Speech recognition error:", event.error);
-      
-      switch (event.error) {
-        case "not-allowed":
-        case "service-not-allowed":
-          setError("Microphone access denied. Please enable microphone permissions in your browser settings.");
-          break;
-        case "no-speech":
-          // Don't show error for no-speech, just continue listening
-          return;
-        case "audio-capture":
-          setError("No microphone found. Please connect a microphone and try again.");
-          break;
-        case "network":
-          setError("Network error. Please check your internet connection.");
-          break;
-        default:
-          setError(`Error: ${event.error}. Please try again.`);
-      }
-      
-      setListening(false);
-    };
-
-    recognition.onend = () => {
-      setListening(false);
-      setInterimTranscript("");
-
-      // Auto-restart if stopped unexpectedly while user hasn't clicked stop
-      if (recognitionRef.current) {
-        setTimeout(() => {
-          if (recognitionRef.current) {
-            try {
-              recognitionRef.current.start();
-            } catch (e) {
-              // Already started or stopped by user
-            }
-          }
-        }, 100);
-      }
-    };
-
-    return recognition;
-  }, []);
-
-  const start = useCallback(async () => {
-    if (!isSupported) {
-      setError("Speech recognition is not supported in this browser.");
-      return;
-    }
-
-    // Request microphone permission explicitly (important for mobile)
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach(track => track.stop());
-    } catch (err) {
-      setError("Microphone access denied. Please enable microphone permissions and try again.");
-      return;
-    }
-
-    // Reset state
-    setTranscript("");
-    setInterimTranscript("");
+  const start = () => {
+    resetTranscript();
     setCurrentIndex(0);
     setAccuracy(0);
-    setError("");
+    SpeechRecognition.startListening({
+      continuous: true,
+      interimResults: true,
+      language: "en-US",
+    });
+  };
 
-    // Stop existing recognition
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      recognitionRef.current = null;
-    }
+  const stop = () => {
+    SpeechRecognition.stopListening();
+  };
 
-    // Start new recognition
-    const recognition = initRecognition();
-    if (recognition) {
-      recognitionRef.current = recognition;
-      try {
-        recognition.start();
-      } catch (e) {
-        console.error("Error starting recognition:", e);
-        setError("Failed to start speech recognition. Please try again.");
-      }
-    }
-  }, [isSupported, initRecognition]);
-
-  const stop = useCallback(() => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      recognitionRef.current = null;
-    }
-    setListening(false);
-    setInterimTranscript("");
-  }, []);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-        recognitionRef.current = null;
-      }
-    };
-  }, []);
-
-  const progress = Math.min(Math.round((currentIndex / words.length) * 100), 100);
+  const progress = Math.round((currentIndex / words.length) * 100);
 
   return (
     <section className="min-h-screen bg-white flex items-center justify-center px-6 py-12">
@@ -257,19 +97,7 @@ export default function RealtimeReadingTracker() {
 
         {/* Main Container */}
         <div className="space-y-8">
-          {/* Error Message */}
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3"
-            >
-              <IoWarning className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700">{error}</p>
-            </motion.div>
-          )}
-
-          {/* Stats */}
+          {/* Stats - Simplified */}
           <div className="flex items-center justify-center gap-8 text-center">
             <div>
               <p className="text-sm text-slate-500 mb-1">Words</p>
@@ -289,7 +117,7 @@ export default function RealtimeReadingTracker() {
             </div>
           </div>
 
-          {/* Progress Bar */}
+          {/* Progress Bar - Minimal */}
           <div className="w-full">
             <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
               <div
@@ -300,18 +128,18 @@ export default function RealtimeReadingTracker() {
             </div>
           </div>
 
-          {/* Reading Passage */}
+          {/* Reading Passage - Clean */}
           <div className="bg-slate-50 rounded-lg p-8 border border-slate-200">
             <div className="text-lg md:text-xl leading-loose text-slate-800">
               {words.map((word, i) => {
                 let className = "inline-block px-1 mx-0.5 my-1 transition-colors duration-200 ";
 
                 if (i < currentIndex) {
-                  className += "text-slate-400";
+                  className += "text-slate-400"; // read - faded out
                 } else if (i === currentIndex) {
-                  className += "text-sky-500 font-semibold";
+                  className += "text-sky-500 font-semibold"; // current - highlighted
                 } else {
-                  className += "text-slate-800";
+                  className += "text-slate-800"; // unread - normal
                 }
 
                 return (
@@ -323,14 +151,13 @@ export default function RealtimeReadingTracker() {
             </div>
           </div>
 
-          {/* Controls */}
+          {/* Controls - Simple & Clear */}
           <div className="flex flex-col sm:flex-row justify-center gap-3">
             {!listening ? (
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={start}
-                disabled={!isSupported}
-                className="flex items-center justify-center gap-2 px-8 py-3 bg-sky-500 text-white font-medium rounded-lg hover:bg-sky-600 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-2 px-8 py-3 bg-sky-500 text-white font-medium rounded-lg hover:bg-sky-600 transition-colors"
               >
                 <IoMic className="w-5 h-5" />
                 Start Reading
@@ -347,7 +174,7 @@ export default function RealtimeReadingTracker() {
             )}
           </div>
 
-          {/* Live Indicator */}
+          {/* Live Indicator - Subtle */}
           <AnimatePresence>
             {listening && (
               <motion.div
@@ -365,11 +192,6 @@ export default function RealtimeReadingTracker() {
               </motion.div>
             )}
           </AnimatePresence>
-
-          {/* Mobile Tips */}
-          <div className="text-center text-xs text-slate-500">
-            <p>💡 Speak clearly at a natural pace • Allow microphone access when prompted</p>
-          </div>
         </div>
       </div>
     </section>
