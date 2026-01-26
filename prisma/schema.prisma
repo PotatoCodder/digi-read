@@ -1,23 +1,19 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider = "prisma-client-js"
+  output = "../app/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
+  url = "file:./dev.db"
 }
-
 model Student {
   id Int @id @default(autoincrement())
   fullName String
   class Class @relation(fields: [classId], references: [id])
   classId Int
+
+  readingRecords ReadingRecord[]
 }
 
 model Teacher {
@@ -32,4 +28,18 @@ model Class {
   teacher Teacher @relation(fields: [teacherId], references: [id])
   teacherId Int
   students Student[]
+
+  readingRecords ReadingRecord[]
+}
+
+model ReadingRecord {
+  id Int @id @default(autoincrement())
+  student Student @relation(fields: [studentId], references: [id])
+  studentId Int
+  class Class @relation(fields: [classId], references: [id])
+  classId Int
+  score Int
+  section String
+  startTime DateTime
+  endTime DateTime
 }

@@ -27,21 +27,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Center Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <a 
-              href="#features" 
-              className="text-slate-600 hover:text-sky-500 font-medium transition-colors duration-200"
-            >
-              Features
-            </a>
-            <a 
-              href="#resources" 
-              className="text-slate-600 hover:text-sky-500 font-medium transition-colors duration-200"
-            >
-              Resources
-            </a>
-          </div>
 
           {/* Right - CTA Button */}
           <div className="flex items-center space-x-4">
