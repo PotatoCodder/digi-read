@@ -86,6 +86,7 @@ export default function ClassroomPage() {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const fullName = formData.get('fullName') as string
+    const form = e.currentTarget
     try {
       const res = await fetch('/api/teacher', {
         method: 'POST',
@@ -94,7 +95,7 @@ export default function ClassroomPage() {
       })
       if (res.ok) {
         await fetchData()
-        e.currentTarget.reset()
+        form.reset()
         showNotification('Teacher added successfully!', 'success')
       } else {
         showNotification('Failed to add teacher', 'error')
@@ -110,6 +111,7 @@ export default function ClassroomPage() {
     const formData = new FormData(e.currentTarget)
     const section = formData.get('section') as string
     const teacherId = parseInt(formData.get('teacherId') as string)
+    const form = e.currentTarget
     try {
       const res = await fetch('/api/classroom', {
         method: 'POST',
@@ -118,7 +120,7 @@ export default function ClassroomPage() {
       })
       if (res.ok) {
         await fetchData()
-        e.currentTarget.reset()
+        form.reset()
         showNotification('Classroom created successfully!', 'success')
       } else {
         showNotification('Failed to create classroom', 'error')
@@ -134,6 +136,7 @@ export default function ClassroomPage() {
     const formData = new FormData(e.currentTarget)
     const fullName = formData.get('fullName') as string
     const classId = parseInt(formData.get('classId') as string)
+    const form = e.currentTarget
     try {
       const res = await fetch('/api/student', {
         method: 'POST',
@@ -142,7 +145,7 @@ export default function ClassroomPage() {
       })
       if (res.ok) {
         await fetchData()
-        e.currentTarget.reset()
+        form.reset()
         showNotification('Student added successfully!', 'success')
       } else {
         showNotification('Failed to add student', 'error')
