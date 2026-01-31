@@ -34,6 +34,7 @@ export default function ClassroomPage() {
   const [students, setStudents] = useState<Student[]>([])
   const [loading, setLoading] = useState(true)
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -54,6 +55,11 @@ export default function ClassroomPage() {
     setNotification({ message, type })
     setTimeout(() => setNotification(null), 3000)
   }
+
+  const filteredClassrooms = classrooms.filter(classroom =>
+    classroom.section.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    classroom.teacher.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   const fetchData = async () => {
     try {
@@ -442,15 +448,55 @@ export default function ClassroomPage() {
             <p className="text-slate-600">View student performance by classroom</p>
           </div>
 
-          {classrooms.length === 0 ? (
+          {/* Search Filter */}
+          <div className="mb-6 flex justify-center">
+            <div className="relative w-full max-w-md">
+              <input
+                type="text"
+                placeholder="Search classrooms by section or teacher..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-3 pl-10 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+              />
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {filteredClassrooms.length === 0 ? (
             <div className="bg-slate-50 rounded-lg p-12 border border-slate-200 text-center">
               <IoSchool className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-500 text-lg">No classrooms created yet</p>
-              <p className="text-sm text-slate-400 mt-2">Create a classroom to start tracking student performance</p>
+              <p className="text-slate-500 text-lg">
+                {searchTerm ? 'No classrooms match your search' : 'No classrooms created yet'}
+              </p>
+              <p className="text-sm text-slate-400 mt-2">
+                {searchTerm ? 'Try a different search term' : 'Create a classroom to start tracking student performance'}
+              </p>
             </div>
           ) : (
             <div className="space-y-6">
-              {classrooms.map(classroom => (
+              {filteredClassrooms.map(classroom => (
                 <motion.div
                   key={classroom.id}
                   initial={{ opacity: 0, y: 20 }}

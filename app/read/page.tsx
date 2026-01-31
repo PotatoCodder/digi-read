@@ -35,6 +35,8 @@ export default function ReadPage() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
   const [loading, setLoading] = useState(true)
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const [classroomSearchTerm, setClassroomSearchTerm] = useState('')
+  const [studentSearchTerm, setStudentSearchTerm] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -64,6 +66,15 @@ export default function ReadPage() {
     setNotification({ message, type })
     setTimeout(() => setNotification(null), 3000)
   }
+
+  const filteredClassrooms = classrooms.filter(classroom =>
+    classroom.section.toLowerCase().includes(classroomSearchTerm.toLowerCase()) ||
+    classroom.teacher.fullName.toLowerCase().includes(classroomSearchTerm.toLowerCase())
+  )
+
+  const filteredStudents = selectedClassroom?.students.filter(student =>
+    student.fullName.toLowerCase().includes(studentSearchTerm.toLowerCase())
+  ) || []
 
   const handleStop = async (score: number, accuracy: number, startTime: Date, endTime: Date) => {
     if (!selectedStudent) return
@@ -171,15 +182,55 @@ export default function ReadPage() {
               </div>
             </div>
 
+            {/* Search Filter */}
+            <div className="mb-6">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search classrooms by section or teacher..."
+                  value={classroomSearchTerm}
+                  onChange={(e) => setClassroomSearchTerm(e.target.value)}
+                  className="w-full px-4 py-3 pl-10 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                />
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                {classroomSearchTerm && (
+                  <button
+                    onClick={() => setClassroomSearchTerm('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </div>
+
             {/* Classroom Selection */}
-            {classrooms.length === 0 ? (
+            {filteredClassrooms.length === 0 ? (
               <div className="bg-slate-50 rounded-lg p-8 border border-slate-200 text-center">
-                <p className="text-slate-500 mb-4">No classrooms available.</p>
-                <p className="text-sm text-slate-400">Please create a classroom first.</p>
+                <p className="text-slate-500 mb-4">
+                  {classroomSearchTerm ? 'No classrooms match your search.' : 'No classrooms available.'}
+                </p>
+                <p className="text-sm text-slate-400">
+                  {classroomSearchTerm ? 'Try a different search term.' : 'Please create a classroom first.'}
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-3">
-                {classrooms.map(classroom => (
+                {filteredClassrooms.map(classroom => (
                   <motion.button
                     key={classroom.id}
                     whileHover={{ scale: 1.02 }}
@@ -265,11 +316,51 @@ export default function ReadPage() {
               </div>
             </div>
 
+            {/* Search Filter */}
+            <div className="mb-6">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search students by name..."
+                  value={studentSearchTerm}
+                  onChange={(e) => setStudentSearchTerm(e.target.value)}
+                  className="w-full px-4 py-3 pl-10 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                />
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                {studentSearchTerm && (
+                  <button
+                    onClick={() => setStudentSearchTerm('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </div>
+
             {/* Student Selection */}
-            {selectedClassroom.students.length === 0 ? (
+            {filteredStudents.length === 0 ? (
               <div className="bg-slate-50 rounded-lg p-8 border border-slate-200 text-center">
-                <p className="text-slate-500 mb-4">No students in this classroom.</p>
-                <p className="text-sm text-slate-400">Please add students first.</p>
+                <p className="text-slate-500 mb-4">
+                  {studentSearchTerm ? 'No students match your search.' : 'No students in this classroom.'}
+                </p>
+                <p className="text-sm text-slate-400">
+                  {studentSearchTerm ? 'Try a different search term.' : 'Please add students first.'}
+                </p>
               </div>
             ) : (
               <>
@@ -279,7 +370,7 @@ export default function ReadPage() {
                     <select
                       value=""
                       onChange={(e) => {
-                        const student = selectedClassroom.students.find(s => s.id === parseInt(e.target.value))
+                        const student = filteredStudents.find(s => s.id === parseInt(e.target.value))
                         if (student) {
                           setSelectedStudent(student)
                         }
@@ -287,7 +378,7 @@ export default function ReadPage() {
                       className="w-full px-4 py-4 pr-12 bg-white border-2 border-slate-300 rounded-lg text-slate-900 text-lg font-medium appearance-none cursor-pointer hover:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
                     >
                       <option value="">Choose a student...</option>
-                      {selectedClassroom.students.map(student => (
+                      {filteredStudents.map(student => (
                         <option key={student.id} value={student.id}>
                           {student.fullName}
                         </option>
@@ -301,7 +392,7 @@ export default function ReadPage() {
                 <div>
                   <p className="text-sm text-slate-600 mb-4 text-center font-medium">Or select from the list:</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto">
-                    {selectedClassroom.students.map(student => (
+                    {filteredStudents.map(student => (
                       <motion.button
                         key={student.id}
                         whileHover={{ scale: 1.02 }}
