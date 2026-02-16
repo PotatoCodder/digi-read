@@ -76,7 +76,7 @@ export default function ReadPage() {
     student.fullName.toLowerCase().includes(studentSearchTerm.toLowerCase())
   ) || []
 
-  const handleStop = async (score: number, accuracy: number, startTime: Date, endTime: Date) => {
+  const handleStop = async (score: number, accuracy: number, startTime: Date, endTime: Date, passageTitle: string) => {
     if (!selectedStudent) return
 
     try {
@@ -87,7 +87,7 @@ export default function ReadPage() {
           studentId: selectedStudent.id,
           classId: selectedStudent.classId,
           score: accuracy,
-          section: 'Solar System Reading',
+          section: passageTitle,
           startTime: startTime.toISOString(),
           endTime: endTime.toISOString()
         })
@@ -140,15 +140,13 @@ export default function ReadPage() {
             className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full mx-4"
           >
             <div
-              className={`rounded-lg p-4 shadow-lg flex items-start gap-3 ${
-                notification.type === 'success'
+              className={`rounded-lg p-4 shadow-lg flex items-start gap-3 ${notification.type === 'success'
                   ? 'bg-emerald-50 border border-emerald-200'
                   : 'bg-red-50 border border-red-200'
-              }`}
+                }`}
             >
-              <IoCheckmarkCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                notification.type === 'success' ? 'text-emerald-500' : 'text-red-500'
-              }`} />
+              <IoCheckmarkCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${notification.type === 'success' ? 'text-emerald-500' : 'text-red-500'
+                }`} />
               <p className={`text-sm font-medium ${notification.type === 'success' ? 'text-emerald-700' : 'text-red-700'}`}>
                 {notification.message}
               </p>
@@ -465,7 +463,7 @@ export default function ReadPage() {
           </motion.div>
 
           {/* Reading Tracker */}
-          <RealtimeReadingTracker 
+          <RealtimeReadingTracker
             onStop={handleStop}
             studentName={selectedStudent.fullName}
             classroom={selectedClassroom?.section || ''}
