@@ -191,11 +191,10 @@ export default function ClassroomPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className={`mb-8 rounded-lg p-4 flex items-start gap-3 ${
-                notification.type === 'success'
-                  ? 'bg-emerald-50 border border-emerald-200'
-                  : 'bg-red-50 border border-red-200'
-              }`}
+              className={`mb-8 rounded-lg p-4 flex items-start gap-3 ${notification.type === 'success'
+                ? 'bg-emerald-50 border border-emerald-200'
+                : 'bg-red-50 border border-red-200'
+                }`}
             >
               {notification.type === 'success' ? (
                 <IoCheckmarkCircle className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
@@ -210,20 +209,18 @@ export default function ClassroomPage() {
         </AnimatePresence>
 
         {/* Stats Overview */}
-        <div className="flex items-center justify-center gap-8 mb-12 text-center">
-          <div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 mb-12">
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
             <p className="text-sm text-slate-500 mb-1">Teachers</p>
-            <p className="text-2xl font-bold text-slate-900">{teachers.length}</p>
+            <p className="text-2xl md:text-3xl font-bold text-slate-900">{teachers.length}</p>
           </div>
-          <div className="w-px h-12 bg-slate-200" />
-          <div>
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
             <p className="text-sm text-slate-500 mb-1">Classrooms</p>
-            <p className="text-2xl font-bold text-sky-500">{classrooms.length}</p>
+            <p className="text-2xl md:text-3xl font-bold text-sky-500">{classrooms.length}</p>
           </div>
-          <div className="w-px h-12 bg-slate-200" />
-          <div>
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center col-span-2 md:col-span-1">
             <p className="text-sm text-slate-500 mb-1">Students</p>
-            <p className="text-2xl font-bold text-emerald-500">{students.length}</p>
+            <p className="text-2xl md:text-3xl font-bold text-emerald-500">{students.length}</p>
           </div>
         </div>
 
@@ -562,16 +559,15 @@ export default function ClassroomPage() {
                           {classroom.students.map((student, index) => {
                             const averageScore = student.readingRecords.length > 0
                               ? Math.round(
-                                  student.readingRecords.reduce((sum: number, record: any) => sum + record.score, 0) / 
-                                  student.readingRecords.length
-                                )
+                                student.readingRecords.reduce((sum: number, record: any) => sum + record.score, 0) /
+                                student.readingRecords.length
+                              )
                               : 0;
-                            
+
                             const getScoreColor = (score: number) => {
-                              if (score >= 90) return 'text-emerald-600 bg-emerald-50 border-emerald-200';
-                              if (score >= 80) return 'text-sky-600 bg-sky-50 border-sky-200';
-                              if (score >= 70) return 'text-amber-600 bg-amber-50 border-amber-200';
-                              return 'text-red-600 bg-red-50 border-red-200';
+                              if (score >= 95) return 'text-emerald-600 bg-emerald-50 border-emerald-200'; // Independent
+                              if (score >= 90) return 'text-sky-600 bg-sky-50 border-sky-200'; // Instructional
+                              return 'text-amber-600 bg-amber-50 border-amber-200'; // Frustration
                             };
 
                             return (

@@ -1,64 +1,108 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { IoMenu, IoClose } from "react-icons/io5";
 
 export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => setIsOpen(!isOpen);
+
+  const navLinks = [
+    { name: "Home", href: "/" },
+    { name: "Classroom", href: "/classroom" },
+    { name: "Demo", href: "/read" },
+  ];
+
   return (
     <nav className="w-full bg-white border-b border-slate-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo/Brand - Left */}
-          <div className="flex items-center">
+          <Link href="/" className="flex items-center group">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center">
-                <svg 
-                  className="w-5 h-5 text-white" 
-                  fill="none" 
-                  stroke="currentColor" 
+              <div className="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center group-hover:bg-sky-600 transition-colors">
+                <svg
+                  className="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" 
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                   />
                 </svg>
               </div>
               <span className="text-xl font-bold text-slate-900">Digi-Read</span>
             </div>
-          </div>
+          </Link>
 
-
-          {/* Right - CTA Button */}
-          <div className="flex items-center space-x-4">
-            <Link 
-              href="/classroom"
-              className="hidden sm:block px-4 py-2.5 text-slate-700 font-medium rounded-lg hover:bg-slate-100 transition-colors duration-200"
-            >
-              Classroom
-            </Link>
-            <button className="hidden sm:block px-6 py-2.5 bg-sky-500 text-white font-medium rounded-lg hover:bg-sky-600 transition-colors duration-200 shadow-sm hover:shadow-md">
-              <Link href="/read">Try It Free</Link>
-            </button>
-            
-            {/* Mobile Menu Button */}
-            <button className="md:hidden p-2 text-slate-600 hover:text-sky-500">
-              <svg 
-                className="w-6 h-6" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-6">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className="text-slate-600 font-medium hover:text-sky-500 transition-colors"
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M4 6h16M4 12h16M4 18h16" 
-                />
-              </svg>
-            </button>
+                {link.name}
+              </Link>
+            ))}
+            <Link href="/read">
+              <button className="px-6 py-2 bg-sky-500 text-white font-medium rounded-lg hover:bg-sky-600 transition-all shadow-sm hover:shadow-md active:scale-95">
+                Try It Free
+              </button>
+            </Link>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden p-2 text-slate-600 hover:text-sky-500 transition-colors"
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            {isOpen ? <IoClose className="w-6 h-6" /> : <IoMenu className="w-6 h-6" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="md:hidden bg-white border-t border-slate-100 overflow-hidden"
+          >
+            <div className="px-6 py-8 flex flex-col space-y-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className="text-lg font-semibold text-slate-800 hover:text-sky-500 transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ))}
+              <Link
+                href="/read"
+                onClick={() => setIsOpen(false)}
+                className="w-full py-4 bg-sky-500 text-white text-center font-bold rounded-xl shadow-lg active:scale-[0.98] transition-all"
+              >
+                Start Free Trial
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

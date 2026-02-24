@@ -58,7 +58,7 @@ export default function DemoFeature() {
     <section className="min-h-screen bg-slate-50 flex items-center justify-center px-6 py-20">
       <div className="max-w-7xl mx-auto w-full">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          
+
           {/* Left Side - Mini Demo */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -175,8 +175,8 @@ export default function DemoFeature() {
 
             {/* Description */}
             <p className="text-lg text-slate-600 leading-relaxed">
-              Digi-Read uses advanced AI and voice recognition to provide real-time reading 
-              assessment and feedback. Watch as students read, track their progress instantly, 
+              Digi-Read uses advanced AI and voice recognition to provide real-time reading
+              assessment and feedback. Watch as students read, track their progress instantly,
               and get actionable insights to improve fluency.
             </p>
 
@@ -207,14 +207,16 @@ export default function DemoFeature() {
                 <Link href="/read">Try It Free</Link>
                 <IoArrowForward className="w-5 h-5" />
               </motion.button>
-              
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-6 py-3 bg-white text-slate-700 font-semibold rounded-lg border-2 border-slate-200 hover:border-sky-500 hover:text-sky-500 transition-all"
-              >
-                View Demo
-              </motion.button>
+
+              <Link href="/classroom">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-6 py-3 bg-white text-slate-700 font-semibold rounded-lg border-2 border-slate-200 hover:border-sky-500 hover:text-sky-500 transition-all"
+                >
+                  Create Classroom
+                </motion.button>
+              </Link>
             </div>
 
             {/* Social Proof */}

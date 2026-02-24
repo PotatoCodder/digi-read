@@ -60,6 +60,7 @@ export default function RealtimeReadingTracker({
   const [accuracy, setAccuracy] = useState(0);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [wordStatuses, setWordStatuses] = useState<('correct' | 'wrong' | 'unread')[]>([]);
   const [sessionData, setSessionData] = useState({
     finalAccuracy: 0,
     finalWordsRead: 0,
@@ -77,7 +78,7 @@ export default function RealtimeReadingTracker({
     }
   }, []);
 
-  // Real-time tracking
+  // Real-time tracking with accurate matching
   useEffect(() => {
     const spokenWords = transcript
       .toLowerCase()
@@ -85,14 +86,69 @@ export default function RealtimeReadingTracker({
       .split(/\s+/)
       .filter(Boolean);
 
-    setCurrentIndex(spokenWords.length);
+    let wStatus: ('correct' | 'wrong' | 'unread')[] = Array(words.length).fill('unread');
 
-    // Calculate accuracy
-    if (spokenWords.length > 0) {
-      const correctWords = spokenWords.filter(
-        (word, i) => word === words[i]
-      ).length;
-      setAccuracy(Math.round((correctWords / spokenWords.length) * 100));
+    let spokenIdx = 0;
+    let passageIdx = 0;
+    let correctCount = 0;
+
+    // Lookahead window size to recover from misheard/extra/skipped words
+    const LOOKAHEAD_WINDOW = 4;
+
+    while (spokenIdx < spokenWords.length && passageIdx < words.length) {
+      const sWord = spokenWords[spokenIdx];
+      const pWord = words[passageIdx];
+
+      if (sWord === pWord) {
+        wStatus[passageIdx] = 'correct';
+        correctCount++;
+        spokenIdx++;
+        passageIdx++;
+      } else {
+        // 1. Check if the user skipped words (is sWord matching a future passage word?)
+        let foundInPassage = false;
+        for (let i = 1; i <= LOOKAHEAD_WINDOW && passageIdx + i < words.length; i++) {
+          if (sWord === words[passageIdx + i]) {
+            // User skipped some words, mark them as wrong
+            for (let j = 0; j < i; j++) {
+              wStatus[passageIdx + j] = 'wrong';
+            }
+            passageIdx += i; // jump to the matched word
+            foundInPassage = true;
+            break;
+          }
+        }
+
+        if (!foundInPassage) {
+          // 2. Check if the user said extra/wrong words (is pWord matching a future spoken word?)
+          let foundInSpoken = false;
+          for (let i = 1; i <= LOOKAHEAD_WINDOW && spokenIdx + i < spokenWords.length; i++) {
+            if (spokenWords[spokenIdx + i] === pWord) {
+              // User said extra words, skip the spoken words
+              spokenIdx += i;
+              foundInSpoken = true;
+              break;
+            }
+          }
+
+          if (!foundInSpoken) {
+            // 3. No match found in the lookahead window, mark current word as wrong and increment both
+            wStatus[passageIdx] = 'wrong';
+            spokenIdx++;
+            passageIdx++;
+          }
+        }
+      }
+    }
+
+    setWordStatuses(wStatus);
+    setCurrentIndex(passageIdx);
+
+    const totalEvaluated = passageIdx;
+    if (totalEvaluated > 0) {
+      setAccuracy(Math.round((correctCount / totalEvaluated) * 100));
+    } else {
+      setAccuracy(0);
     }
   }, [transcript, words]);
 
@@ -112,6 +168,7 @@ export default function RealtimeReadingTracker({
     resetTranscript();
     setCurrentIndex(0);
     setAccuracy(0);
+    setWordStatuses([]);
     setStartTime(new Date());
     SpeechRecognition.startListening({
       continuous: true,
@@ -153,6 +210,7 @@ export default function RealtimeReadingTracker({
     resetTranscript();
     setCurrentIndex(0);
     setAccuracy(0);
+    setWordStatuses([]);
   };
 
   const progress = Math.round((currentIndex / words.length) * 100);
@@ -220,14 +278,17 @@ export default function RealtimeReadingTracker({
               </button>
               <div className="text-lg md:text-xl leading-loose text-slate-800 whitespace-pre-wrap">
                 {currentPassage.content.split(/\s+/).map((word, i) => {
-                  let className = "inline-block px-1 mx-0.5 my-1 transition-colors duration-200 ";
+                  let className = "inline-block px-1 mx-0.5 my-1 transition-all duration-75 ";
+                  const status = wordStatuses[i] || 'unread';
 
-                  if (i < currentIndex) {
-                    className += "text-slate-400"; // read - faded out
+                  if (status === 'correct') {
+                    className += "text-blue-500 font-medium";
+                  } else if (status === 'wrong') {
+                    className += "text-red-500 font-medium underline decoration-red-300 decoration-2";
                   } else if (i === currentIndex) {
-                    className += "text-sky-500 font-semibold"; // current - highlighted
+                    className += "text-sky-500 font-bold bg-sky-100/50 rounded shadow-sm scale-110";
                   } else {
-                    className += "text-slate-800"; // unread - normal
+                    className += "text-slate-800";
                   }
 
                   return (

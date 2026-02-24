@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import heroImage from '@/assets/heroo.png';
 export default function HeroSection() {
   return (
@@ -22,12 +23,16 @@ export default function HeroSection() {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4">
-              <button className="px-8 py-3.5 bg-sky-500 text-white font-semibold rounded-lg hover:bg-sky-600 transition-colors duration-200 shadow-md hover:shadow-lg">
-                Get Started
-              </button>
-              <button className="px-8 py-3.5 bg-white text-slate-700 font-semibold rounded-lg border-2 border-slate-200 hover:border-sky-500 hover:text-sky-500 transition-all duration-200 shadow-sm">
-                Let's Try
-              </button>
+              <Link href="/classroom">
+                <button className="px-8 py-3.5 bg-sky-500 text-white font-semibold rounded-lg hover:bg-sky-600 transition-colors duration-200 shadow-md hover:shadow-lg">
+                  Create Classroom
+                </button>
+              </Link>
+              <Link href="/read">
+                <button className="px-8 py-3.5 bg-white text-slate-700 font-semibold rounded-lg border-2 border-slate-200 hover:border-sky-500 hover:text-sky-500 transition-all duration-200 shadow-sm">
+                  Try Demo
+                </button>
+              </Link>
             </div>
 
             {/* Optional Stats/Features */}
@@ -59,17 +64,17 @@ export default function HeroSection() {
           </div>
 
           {/* Right Side - Image */}
-          <div className="relative">
-            <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-sm">
+          <div className="relative order-first md:order-last">
+            <div className="relative w-full h-[300px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src={heroImage} // Update this path to match your actual image location
+                src={heroImage}
                 alt="Digi-Read platform demonstration"
                 fill
-                className="px-4 py-8"
+                className="object-cover"
                 priority
               />
               {/* Optional gradient overlay for better image integration */}
-              <div className="absolute inset-0  from-sky-500/10 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-sky-500/10 to-transparent"></div>
             </div>
 
             {/* Optional floating card accent */}

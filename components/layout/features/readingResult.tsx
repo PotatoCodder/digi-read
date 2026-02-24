@@ -3,11 +3,11 @@
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { gsap } from "gsap";
-import { 
-  IoCheckmarkCircle, 
-  IoCloseCircle, 
-  IoTrophy, 
-  IoTime, 
+import {
+  IoCheckmarkCircle,
+  IoCloseCircle,
+  IoTrophy,
+  IoTime,
   IoStatsChart,
   IoRefresh,
   IoClose
@@ -74,19 +74,31 @@ export default function ReadingResults({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const getGrade = (score: number) => {
-    if (score >= 95) return { grade: 'A+', color: 'text-emerald-600' };
-    if (score >= 90) return { grade: 'A', color: 'text-emerald-600' };
-    if (score >= 85) return { grade: 'B+', color: 'text-sky-600' };
-    if (score >= 80) return { grade: 'B', color: 'text-sky-600' };
-    if (score >= 75) return { grade: 'C+', color: 'text-amber-600' };
-    if (score >= 70) return { grade: 'C', color: 'text-amber-600' };
-    if (score >= 65) return { grade: 'D+', color: 'text-orange-600' };
-    if (score >= 60) return { grade: 'D', color: 'text-orange-600' };
-    return { grade: 'F', color: 'text-red-600' };
+  const getReadingLevel = (score: number) => {
+    if (score >= 95) return {
+      level: 'Independent',
+      fullText: 'Independent Level',
+      color: 'text-emerald-600',
+      badgeColor: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+      icon: IoTrophy
+    };
+    if (score >= 90) return {
+      level: 'Instructional',
+      fullText: 'Instructional Level',
+      color: 'text-sky-600',
+      badgeColor: 'bg-sky-50 border-sky-200 text-sky-700',
+      icon: IoCheckmarkCircle
+    };
+    return {
+      level: 'Frustration',
+      fullText: 'Frustration Level',
+      color: 'text-amber-600',
+      badgeColor: 'bg-amber-50 border-amber-200 text-amber-700',
+      icon: IoRefresh
+    };
   };
 
-  const grade = getGrade(accuracy);
+  const readingLevel = getReadingLevel(accuracy);
   const progressPercentage = Math.round((wordsRead / totalWords) * 100);
 
   return (
@@ -108,11 +120,10 @@ export default function ReadingResults({
             className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
           >
             {/* Header */}
-            <div className={`relative px-8 pt-8 pb-6 ${
-              passed 
-                ? 'bg-gradient-to-br from-emerald-500 to-emerald-600' 
-                : 'bg-gradient-to-br from-slate-500 to-slate-600'
-            }`}>
+            <div className={`relative px-8 pt-8 pb-6 ${passed
+              ? 'bg-gradient-to-br from-emerald-500 to-emerald-600'
+              : 'bg-gradient-to-br from-slate-500 to-slate-600'
+              }`}>
               <button
                 onClick={onClose}
                 className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"
@@ -172,66 +183,57 @@ export default function ReadingResults({
                       strokeLinecap="round"
                       className={passed ? 'text-emerald-500' : 'text-slate-400'}
                       initial={{ strokeDasharray: "552.92", strokeDashoffset: "552.92" }}
-                      animate={{ 
-                        strokeDashoffset: 552.92 - (552.92 * accuracy) / 100 
+                      animate={{
+                        strokeDashoffset: 552.92 - (552.92 * accuracy) / 100
                       }}
                       transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
                     />
                   </svg>
-                  
+
                   {/* Score text */}
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <div className="flex items-baseline">
-                      <span 
+                      <span
                         ref={scoreRef}
-                        className={`text-5xl font-bold ${
-                          passed ? 'text-emerald-600' : 'text-slate-700'
-                        }`}
+                        className={`text-5xl font-bold ${passed ? 'text-emerald-600' : 'text-slate-700'
+                          }`}
                       >
                         0
                       </span>
-                      <span className={`text-2xl font-semibold ml-1 ${
-                        passed ? 'text-emerald-500' : 'text-slate-500'
-                      }`}>
+                      <span className={`text-2xl font-semibold ml-1 ${passed ? 'text-emerald-500' : 'text-slate-500'
+                        }`}>
                         %
                       </span>
                     </div>
-                    <div className={`text-xl font-bold mt-2 ${grade.color}`}>
-                      {grade.grade}
+                    <div className={`text-xl font-bold mt-2 ${readingLevel.color}`}>
+                      {readingLevel.level}
                     </div>
                     <div className="text-sm text-slate-500 mt-1">Accuracy</div>
                   </div>
                 </div>
 
-                {/* Pass/Fail Badge */}
+                {/* Reading Level Badge */}
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.5, type: "spring" }}
                   className="mt-6"
                 >
-                  {passed ? (
-                    <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-6 py-3 rounded-full">
-                      <IoTrophy className="w-5 h-5 text-emerald-600" />
-                      <span className="text-emerald-700 font-bold">Passed!</span>
-                    </div>
-                  ) : (
-                    <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 px-6 py-3 rounded-full">
-                      <IoRefresh className="w-5 h-5 text-slate-600" />
-                      <span className="text-slate-700 font-bold">Try Again</span>
-                    </div>
-                  )}
+                  <div className={`inline-flex items-center gap-2 border px-6 py-3 rounded-full ${readingLevel.badgeColor}`}>
+                    <readingLevel.icon className="w-5 h-5" />
+                    <span className="font-bold">{readingLevel.fullText}</span>
+                  </div>
                 </motion.div>
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div className="bg-slate-50 rounded-lg p-4 text-center border border-slate-200">
                   <div className="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center mx-auto mb-2">
                     <IoStatsChart className="w-5 h-5 text-sky-600" />
                   </div>
                   <div className="text-2xl font-bold text-slate-900">{wordsRead}</div>
-                  <div className="text-xs text-slate-500 mt-1">Words Read</div>
+                  <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">Words Read</div>
                 </div>
 
                 <div className="bg-slate-50 rounded-lg p-4 text-center border border-slate-200">
@@ -239,7 +241,7 @@ export default function ReadingResults({
                     <IoStatsChart className="w-5 h-5 text-purple-600" />
                   </div>
                   <div className="text-2xl font-bold text-slate-900">{progressPercentage}%</div>
-                  <div className="text-xs text-slate-500 mt-1">Progress</div>
+                  <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">Progress</div>
                 </div>
 
                 <div className="bg-slate-50 rounded-lg p-4 text-center border border-slate-200">
@@ -247,7 +249,7 @@ export default function ReadingResults({
                     <IoTime className="w-5 h-5 text-amber-600" />
                   </div>
                   <div className="text-2xl font-bold text-slate-900">{formatDuration(duration)}</div>
-                  <div className="text-xs text-slate-500 mt-1">Duration</div>
+                  <div className="text-xs text-slate-500 mt-1 uppercase tracking-wider font-semibold">Duration</div>
                 </div>
               </div>
 
@@ -262,34 +264,21 @@ export default function ReadingResults({
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPercentage}%` }}
                     transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
-                    className={`h-full rounded-full ${
-                      passed ? 'bg-emerald-500' : 'bg-slate-400'
-                    }`}
+                    className={`h-full rounded-full ${passed ? 'bg-emerald-500' : 'bg-slate-400'
+                      }`}
                   />
                 </div>
               </div>
 
               {/* Performance Message */}
-              <div className={`rounded-lg p-4 mb-6 ${
-                passed 
-                  ? 'bg-emerald-50 border border-emerald-200' 
-                  : 'bg-amber-50 border border-amber-200'
-              }`}>
-                <p className={`text-sm ${
-                  passed ? 'text-emerald-700' : 'text-amber-700'
-                }`}>
-                  {passed ? (
-                    <>
-                      <strong>Excellent work!</strong> You've successfully completed the reading with {accuracy}% accuracy. 
-                      {accuracy >= 90 && " Outstanding performance!"}
-                      {accuracy >= 80 && accuracy < 90 && " Great job!"}
-                      {accuracy >= 70 && accuracy < 80 && " Good effort!"}
-                    </>
+              <div className={`rounded-lg p-4 mb-6 border ${readingLevel.badgeColor}`}>
+                <p className="text-sm">
+                  {accuracy >= 95 ? (
+                    <><strong>Excellent!</strong> This is an <strong>Independent level</strong> passage. The student can read it successfully without assistance and understands the text well.</>
+                  ) : accuracy >= 90 ? (
+                    <><strong>Good Effort.</strong> This is an <strong>Instructional level</strong> passage. The student can read it with some assistance and is at the optimal level for learning new skills.</>
                   ) : (
-                    <>
-                      <strong>Keep practicing!</strong> You scored {accuracy}%, which is below the passing threshold of {passThreshold}%. 
-                      Try reading more slowly and clearly for better results.
-                    </>
+                    <><strong>Challenging.</strong> This is at a <strong>Frustration level</strong>. The text may be too difficult for the student right now, so consider trying an easier passage.</>
                   )}
                 </p>
               </div>
@@ -309,11 +298,10 @@ export default function ReadingResults({
                     onClose();
                     // You can add a callback here to restart the reading
                   }}
-                  className={`flex-1 px-6 py-3 text-white font-medium rounded-lg transition-colors ${
-                    passed
-                      ? 'bg-emerald-500 hover:bg-emerald-600'
-                      : 'bg-sky-500 hover:bg-sky-600'
-                  }`}
+                  className={`flex-1 px-6 py-3 text-white font-medium rounded-lg transition-colors ${passed
+                    ? 'bg-emerald-500 hover:bg-emerald-600'
+                    : 'bg-sky-500 hover:bg-sky-600'
+                    }`}
                 >
                   {passed ? 'Try Another' : 'Try Again'}
                 </motion.button>
