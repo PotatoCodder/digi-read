@@ -23,14 +23,14 @@ export default function HeroSection() {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4">
-              <Link href="/classroom">
+              <Link href="/read">
                 <button className="px-8 py-3.5 bg-sky-500 text-white font-semibold rounded-lg hover:bg-sky-600 transition-colors duration-200 shadow-md hover:shadow-lg">
-                  Create Classroom
+                  Go to Classes
                 </button>
               </Link>
-              <Link href="/read">
+              <Link href="#about">
                 <button className="px-8 py-3.5 bg-white text-slate-700 font-semibold rounded-lg border-2 border-slate-200 hover:border-sky-500 hover:text-sky-500 transition-all duration-200 shadow-sm">
-                  Try Demo
+                  About
                 </button>
               </Link>
             </div>

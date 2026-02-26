@@ -1,483 +1,106 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { gsap } from 'gsap'
-import { IoPeople, IoCheckmarkCircle, IoChevronBack, IoChevronDown, IoSchool } from 'react-icons/io5'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { IoBook, IoLanguage, IoArrowBack } from 'react-icons/io5'
 import RealtimeReadingTracker from '@/components/layout/features/SpeechRecognition'
 import FeaturesShowcase from '@/components/layout/featureShowcase'
 import TestimonialsSection from '@/components/layout/tesemonials'
 
-interface Student {
-  id: number
-  fullName: string
-  classId: number
-  class: {
-    id: number
-    section: string
-  }
-}
-
-interface Classroom {
-  id: number
-  section: string
-  teacherId: number
-  teacher: {
-    id: number
-    fullName: string
-  }
-  students: Student[]
-}
-
 export default function ReadPage() {
-  const [classrooms, setClassrooms] = useState<Classroom[]>([])
-  const [selectedClassroom, setSelectedClassroom] = useState<Classroom | null>(null)
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
-  const [classroomSearchTerm, setClassroomSearchTerm] = useState('')
-  const [studentSearchTerm, setStudentSearchTerm] = useState('')
-  const containerRef = useRef<HTMLDivElement>(null)
+  const [selectedClass, setSelectedClass] = useState<'English' | 'Tagalog' | null>(null)
 
-  useEffect(() => {
-    fetch('/api/classroom')
-      .then(res => res.json())
-      .then(data => {
-        setClassrooms(data)
-        setLoading(false)
-      })
-      .catch(error => {
-        console.error('Failed to fetch classrooms:', error)
-        setLoading(false)
-      })
-  }, [])
-
-  useEffect(() => {
-    if (containerRef.current && !selectedStudent) {
-      gsap.fromTo(
-        containerRef.current,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
-      )
-    }
-  }, [selectedStudent, selectedClassroom])
-
-  const showNotification = (message: string, type: 'success' | 'error') => {
-    setNotification({ message, type })
-    setTimeout(() => setNotification(null), 3000)
-  }
-
-  const filteredClassrooms = classrooms.filter(classroom =>
-    classroom.section.toLowerCase().includes(classroomSearchTerm.toLowerCase()) ||
-    classroom.teacher.fullName.toLowerCase().includes(classroomSearchTerm.toLowerCase())
-  )
-
-  const filteredStudents = selectedClassroom?.students.filter(student =>
-    student.fullName.toLowerCase().includes(studentSearchTerm.toLowerCase())
-  ) || []
-
-  const handleStop = async (score: number, accuracy: number, startTime: Date, endTime: Date, passageTitle: string) => {
-    if (!selectedStudent) return
-
-    try {
-      const response = await fetch('/api/scores', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          studentId: selectedStudent.id,
-          classId: selectedStudent.classId,
-          score: accuracy,
-          section: passageTitle,
-          startTime: startTime.toISOString(),
-          endTime: endTime.toISOString()
-        })
-      })
-
-      if (response.ok) {
-        showNotification('Score saved successfully!', 'success')
-      } else {
-        showNotification('Failed to save score', 'error')
-      }
-    } catch (error) {
-      console.error('Failed to save score:', error)
-      showNotification('Failed to save score', 'error')
-    }
-  }
-
-  const handleBackToClassrooms = () => {
-    setSelectedClassroom(null)
-    setSelectedStudent(null)
-  }
-
-  const handleBackToStudents = () => {
-    setSelectedStudent(null)
-  }
-
-  if (loading) {
+  if (selectedClass) {
+    const passageId = selectedClass === 'English' ? 'telling-time' : 'karapatang-sibil';
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <motion.div
-            animate={{ opacity: [1, 0.3, 1] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-            className="w-12 h-12 bg-sky-500 rounded-full mx-auto mb-4"
-          />
-          <p className="text-slate-600">Loading classrooms...</p>
-        </div>
+      <div className="relative">
+        <button
+          onClick={() => setSelectedClass(null)}
+          className="absolute top-6 left-6 z-10 px-4 py-2 bg-white rounded-lg shadow-sm border border-slate-200 text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-2"
+        >
+          <IoArrowBack className="w-5 h-5" /> Back to Classes
+        </button>
+        <RealtimeReadingTracker
+          classroom={selectedClass + " Class"}
+          passageId={passageId}
+          studentName="Guest Student"
+        />
       </div>
-    )
+    );
   }
 
   return (
-    <div>
-      {/* Notification */}
-      <AnimatePresence>
-        {notification && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full mx-4"
-          >
-            <div
-              className={`rounded-lg p-4 shadow-lg flex items-start gap-3 ${notification.type === 'success'
-                  ? 'bg-emerald-50 border border-emerald-200'
-                  : 'bg-red-50 border border-red-200'
-                }`}
+    <>
+      <section className="min-h-screen bg-slate-50 px-6 py-12 flex items-center justify-center">
+        <div className="max-w-4xl w-full pt-10">
+          {/* Header */}
+          <div className="mb-12 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
+              Select Your Classroom
+            </h1>
+            <p className="text-lg text-slate-600">
+              Choose a language class to start your reading session
+            </p>
+          </div>
+
+          {/* Classes Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+            {/* English Class Card */}
+            <motion.div
+              whileHover={{ scale: 1.02, translateY: -5 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setSelectedClass('English')}
+              className="cursor-pointer bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden relative"
             >
-              <IoCheckmarkCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${notification.type === 'success' ? 'text-emerald-500' : 'text-red-500'
-                }`} />
-              <p className={`text-sm font-medium ${notification.type === 'success' ? 'text-emerald-700' : 'text-red-700'}`}>
-                {notification.message}
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-500">
+                <IoBook className="w-32 h-32" />
+              </div>
+
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+                <span className="text-3xl">🇬🇧</span>
+              </div>
+
+              <h2 className="text-2xl font-bold text-slate-900 mb-3">English Class</h2>
+              <p className="text-slate-600 mb-6 min-h-[48px]">
+                Practice reading in English. Improve your pronunciation, fluency, and comprehension.
               </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* Step 1: Select Classroom */}
-      {!selectedClassroom && !selectedStudent && (
-        <section className="min-h-screen bg-white flex items-center justify-center px-6 py-12">
-          <div ref={containerRef} className="w-full max-w-2xl">
-            {/* Header */}
-            <div className="mb-12 text-center">
-              <div className="w-16 h-16 bg-sky-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <IoSchool className="w-8 h-8 text-sky-600" />
+              <div className="flex items-center text-blue-600 font-medium group-hover:gap-2 transition-all">
+                <span>Enter Classroom</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
-                Select a Classroom
-              </h1>
-              <p className="text-base text-slate-600">
-                Choose a classroom to view its students
+            </motion.div>
+
+            {/* Tagalog Class Card */}
+            <motion.div
+              whileHover={{ scale: 1.02, translateY: -5 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setSelectedClass('Tagalog')}
+              className="cursor-pointer bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden relative"
+            >
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-500">
+                <IoLanguage className="w-32 h-32" />
+              </div>
+
+              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+                <span className="text-3xl">🇵🇭</span>
+              </div>
+
+              <h2 className="text-2xl font-bold text-slate-900 mb-3">Tagalog Class</h2>
+              <p className="text-slate-600 mb-6 min-h-[48px]">
+                Magsanay sa pagbabasa sa wikang Tagalog. Pagbutihin ang iyong pagbigkas at pag-unawa.
               </p>
-            </div>
 
-            {/* Classroom Count */}
-            <div className="flex items-center justify-center gap-2 mb-8">
-              <div className="text-center">
-                <p className="text-sm text-slate-500 mb-1">Available Classrooms</p>
-                <p className="text-2xl font-bold text-sky-500">{classrooms.length}</p>
+              <div className="flex items-center text-amber-600 font-medium group-hover:gap-2 transition-all">
+                <span>Pumasok sa Klase</span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
               </div>
-            </div>
-
-            {/* Search Filter */}
-            <div className="mb-6">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search classrooms by section or teacher..."
-                  value={classroomSearchTerm}
-                  onChange={(e) => setClassroomSearchTerm(e.target.value)}
-                  className="w-full px-4 py-3 pl-10 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
-                />
-                <svg
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-                {classroomSearchTerm && (
-                  <button
-                    onClick={() => setClassroomSearchTerm('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Classroom Selection */}
-            {filteredClassrooms.length === 0 ? (
-              <div className="bg-slate-50 rounded-lg p-8 border border-slate-200 text-center">
-                <p className="text-slate-500 mb-4">
-                  {classroomSearchTerm ? 'No classrooms match your search.' : 'No classrooms available.'}
-                </p>
-                <p className="text-sm text-slate-400">
-                  {classroomSearchTerm ? 'Try a different search term.' : 'Please create a classroom first.'}
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-3">
-                {filteredClassrooms.map(classroom => (
-                  <motion.button
-                    key={classroom.id}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setSelectedClassroom(classroom)}
-                    className="bg-slate-50 p-6 rounded-lg border-2 border-slate-200 hover:border-sky-400 hover:shadow-md transition-all text-left"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">
-                            <IoSchool className="w-5 h-5 text-sky-600" />
-                          </div>
-                          <div>
-                            <h3 className="font-bold text-slate-900 text-lg">
-                              {classroom.section}
-                            </h3>
-                            <p className="text-sm text-slate-500">
-                              Teacher: {classroom.teacher.fullName}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="inline-flex items-center gap-2 bg-sky-100 px-3 py-1.5 rounded-full">
-                          <IoPeople className="w-4 h-4 text-sky-600" />
-                          <span className="text-sm font-semibold text-sky-700">
-                            {classroom.students.length} {classroom.students.length === 1 ? 'student' : 'students'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.button>
-                ))}
-              </div>
-            )}
-
-            {/* Tips */}
-            <div className="mt-8 text-center text-xs text-slate-500">
-              <p>💡 Select a classroom to see its students</p>
-            </div>
+            </motion.div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
-      {/* Step 2: Select Student from Classroom */}
-      {selectedClassroom && !selectedStudent && (
-        <section className="min-h-screen bg-white flex items-center justify-center px-6 py-12">
-          <div ref={containerRef} className="w-full max-w-2xl">
-            {/* Back Button */}
-            <div className="mb-8">
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={handleBackToClassrooms}
-                className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
-              >
-                <IoChevronBack className="w-5 h-5" />
-                <span className="font-medium">Back to Classrooms</span>
-              </motion.button>
-            </div>
 
-            {/* Header */}
-            <div className="mb-12 text-center">
-              <div className="w-16 h-16 bg-sky-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <IoPeople className="w-8 h-8 text-sky-600" />
-              </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
-                Select a Student
-              </h1>
-              <div className="inline-flex items-center gap-2 bg-slate-100 px-4 py-2 rounded-full">
-                <IoSchool className="w-4 h-4 text-slate-600" />
-                <p className="text-sm font-medium text-slate-700">
-                  {selectedClassroom.section} • {selectedClassroom.teacher.fullName}
-                </p>
-              </div>
-            </div>
-
-            {/* Student Count */}
-            <div className="flex items-center justify-center gap-2 mb-8">
-              <div className="text-center">
-                <p className="text-sm text-slate-500 mb-1">Students in Class</p>
-                <p className="text-2xl font-bold text-sky-500">{selectedClassroom.students.length}</p>
-              </div>
-            </div>
-
-            {/* Search Filter */}
-            <div className="mb-6">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search students by name..."
-                  value={studentSearchTerm}
-                  onChange={(e) => setStudentSearchTerm(e.target.value)}
-                  className="w-full px-4 py-3 pl-10 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
-                />
-                <svg
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-                {studentSearchTerm && (
-                  <button
-                    onClick={() => setStudentSearchTerm('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Student Selection */}
-            {filteredStudents.length === 0 ? (
-              <div className="bg-slate-50 rounded-lg p-8 border border-slate-200 text-center">
-                <p className="text-slate-500 mb-4">
-                  {studentSearchTerm ? 'No students match your search.' : 'No students in this classroom.'}
-                </p>
-                <p className="text-sm text-slate-400">
-                  {studentSearchTerm ? 'Try a different search term.' : 'Please add students first.'}
-                </p>
-              </div>
-            ) : (
-              <>
-                {/* Dropdown */}
-                <div className="bg-slate-50 rounded-lg p-8 border border-slate-200 mb-6">
-                  <div className="relative">
-                    <select
-                      value=""
-                      onChange={(e) => {
-                        const student = filteredStudents.find(s => s.id === parseInt(e.target.value))
-                        if (student) {
-                          setSelectedStudent(student)
-                        }
-                      }}
-                      className="w-full px-4 py-4 pr-12 bg-white border-2 border-slate-300 rounded-lg text-slate-900 text-lg font-medium appearance-none cursor-pointer hover:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
-                    >
-                      <option value="">Choose a student...</option>
-                      {filteredStudents.map(student => (
-                        <option key={student.id} value={student.id}>
-                          {student.fullName}
-                        </option>
-                      ))}
-                    </select>
-                    <IoChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Grid View */}
-                <div>
-                  <p className="text-sm text-slate-600 mb-4 text-center font-medium">Or select from the list:</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto">
-                    {filteredStudents.map(student => (
-                      <motion.button
-                        key={student.id}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => setSelectedStudent(student)}
-                        className="bg-white p-4 rounded-lg border-2 border-slate-200 hover:border-sky-400 hover:shadow-md transition-all text-left"
-                      >
-                        <div className="font-semibold text-slate-900">
-                          {student.fullName}
-                        </div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Tips */}
-            <div className="mt-8 text-center text-xs text-slate-500">
-              <p>💡 Select a student to start tracking their reading progress</p>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Step 3: Reading Tracker */}
-      {selectedStudent && (
-        <>
-          {/* Selected Student Banner */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="sticky top-0 z-40 bg-gradient-to-r from-sky-500 to-sky-600 text-white shadow-lg"
-          >
-            <div className="max-w-7xl mx-auto px-6 py-4">
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                    <IoPeople className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-sky-100">Reading Session For:</p>
-                    <p className="text-lg font-bold">
-                      {selectedStudent.fullName} • {selectedClassroom?.section}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleBackToStudents}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg font-medium transition-colors text-sm"
-                  >
-                    <IoChevronBack className="w-4 h-4" />
-                    <span className="hidden sm:inline">Change Student</span>
-                    <span className="sm:hidden">Student</span>
-                  </motion.button>
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleBackToClassrooms}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg font-medium transition-colors text-sm"
-                  >
-                    <IoSchool className="w-4 h-4" />
-                    <span className="hidden sm:inline">Change Classroom</span>
-                    <span className="sm:hidden">Class</span>
-                  </motion.button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Reading Tracker */}
-          <RealtimeReadingTracker
-            onStop={handleStop}
-            studentName={selectedStudent.fullName}
-            classroom={selectedClassroom?.section || ''}
-          />
-        </>
-      )}
-
-      {/* Features and Testimonials - Only show when no selection made */}
-      {!selectedClassroom && !selectedStudent && (
-        <>
-          <FeaturesShowcase />
-          <TestimonialsSection />
-        </>
-      )}
-    </div>
+    </>
   )
 }

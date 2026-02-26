@@ -208,13 +208,13 @@ export default function DemoFeature() {
                 <IoArrowForward className="w-5 h-5" />
               </motion.button>
 
-              <Link href="/classroom">
+              <Link href="/read">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="px-6 py-3 bg-white text-slate-700 font-semibold rounded-lg border-2 border-slate-200 hover:border-sky-500 hover:text-sky-500 transition-all"
                 >
-                  Create Classroom
+                  Go to Classes
                 </motion.button>
               </Link>
             </div>
