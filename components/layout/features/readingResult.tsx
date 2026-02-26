@@ -75,23 +75,23 @@ export default function ReadingResults({
   };
 
   const getReadingLevel = (score: number) => {
-    if (score >= 95) return {
+    if (score >= 90) return {
       level: 'Independent',
-      fullText: 'Independent Level',
+      fullText: 'Independent Reader',
       color: 'text-emerald-600',
       badgeColor: 'bg-emerald-50 border-emerald-200 text-emerald-700',
       icon: IoTrophy
     };
-    if (score >= 90) return {
+    if (score >= 51) return {
       level: 'Instructional',
-      fullText: 'Instructional Level',
+      fullText: 'Instructional Reader',
       color: 'text-sky-600',
       badgeColor: 'bg-sky-50 border-sky-200 text-sky-700',
       icon: IoCheckmarkCircle
     };
     return {
-      level: 'Frustration',
-      fullText: 'Frustration Level',
+      level: 'Frustrated',
+      fullText: 'Frustrated Reader',
       color: 'text-amber-600',
       badgeColor: 'bg-amber-50 border-amber-200 text-amber-700',
       icon: IoRefresh
@@ -273,12 +273,12 @@ export default function ReadingResults({
               {/* Performance Message */}
               <div className={`rounded-lg p-4 mb-6 border ${readingLevel.badgeColor}`}>
                 <p className="text-sm">
-                  {accuracy >= 95 ? (
-                    <><strong>Excellent!</strong> This is an <strong>Independent level</strong> passage. The student can read it successfully without assistance and understands the text well.</>
-                  ) : accuracy >= 90 ? (
-                    <><strong>Good Effort.</strong> This is an <strong>Instructional level</strong> passage. The student can read it with some assistance and is at the optimal level for learning new skills.</>
+                  {accuracy >= 90 ? (
+                    <><strong>Excellent!</strong> This is an <strong>Independent Reader</strong> level. The student can read it successfully without assistance and understands the text well.</>
+                  ) : accuracy >= 51 ? (
+                    <><strong>Good Effort.</strong> This is an <strong>Instructional Reader</strong> level. The student can read it with some assistance and is at the optimal level for learning new skills.</>
                   ) : (
-                    <><strong>Challenging.</strong> This is at a <strong>Frustration level</strong>. The text may be too difficult for the student right now, so consider trying an easier passage.</>
+                    <><strong>Challenging.</strong> This is at a <strong>Frustrated Reader</strong> level. The text may be too difficult for the student right now, so consider trying an easier passage.</>
                   )}
                 </p>
               </div>
