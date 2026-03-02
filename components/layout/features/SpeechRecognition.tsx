@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -60,7 +61,7 @@ const isMatch = (spoken: string, expected: string) => {
   // If words are very short, require exact match
   if (normExpected.length <= 3 && normSpoken !== normExpected) return false;
   // Allow 1 mistake for every 3 characters + 1 base mistake
-  // This helps massively with accent differences and misheard tagalog words
+  // This helps massively with accent differences and misheard Filipino words
   const maxDistance = Math.floor(normExpected.length / 3) + 1;
   return levenshtein(normSpoken, normExpected) <= maxDistance;
 };
@@ -253,11 +254,27 @@ export default function RealtimeReadingTracker({
     });
   };
 
+  const router = useRouter();
+
   const stop = () => {
     SpeechRecognition.stopListening();
     const endTime = new Date();
     const sessionStartTime = startTime || endTime;
     const duration = Math.floor((endTime.getTime() - sessionStartTime.getTime()) / 1000);
+
+    const sessionResult = {
+      finalAccuracy: accuracy,
+      finalWordsRead: currentIndex,
+      totalWords: words.length,
+      duration,
+      wordStatuses,
+      originalWords,
+      passageTitle: currentPassage.title,
+      language: currentPassage.language,
+      studentName,
+      classroom,
+      date: new Date().toISOString()
+    };
 
     setSessionData({
       finalAccuracy: accuracy,
@@ -265,13 +282,19 @@ export default function RealtimeReadingTracker({
       duration
     });
 
+    // Save to localStorage
+    const history = JSON.parse(localStorage.getItem('readingHistory') || '[]');
+    localStorage.setItem('readingHistory', JSON.stringify([sessionResult, ...history]));
+    localStorage.setItem('lastReadingResult', JSON.stringify(sessionResult));
+
     const progressValue = Math.round((currentIndex / words.length) * 100);
 
     if (onStop && startTime) {
       onStop(accuracy, progressValue, sessionStartTime, endTime, currentPassage.title);
     }
 
-    setShowResults(true);
+    // Instead of showing the modal, we navigate to the results page
+    router.push('/results');
   };
 
   const handleRefreshPassage = () => {
@@ -478,19 +501,6 @@ export default function RealtimeReadingTracker({
         </div>
       </section>
 
-      {/* Reading Results Modal */}
-      <ReadingResults
-        isOpen={showResults}
-        onClose={() => setShowResults(false)}
-        studentName={studentName}
-        classroom={classroom}
-        wordsRead={sessionData.finalWordsRead}
-        totalWords={words.length}
-        accuracy={sessionData.finalAccuracy}
-        duration={sessionData.duration}
-        passed={sessionData.finalAccuracy >= 70}
-        passThreshold={70}
-      />
     </>
   );
 }

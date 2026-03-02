@@ -14,7 +14,7 @@
 Individual files and their specific responsibilities:
 
 ### `/app` Directory (Routes)
-*   `read/page.tsx`: The orchestrator. Manages classroom state (English vs Tagalog) and injects `passageId` into the tracker.
+*   `read/page.tsx`: The orchestrator. Manages classroom state (English vs Filipino) and injects `passageId` into the tracker.
 *   `layout.tsx`: Defines the root HTML, Google Fonts (Geist), and global shared components (Navbar/Footer).
 *   `api/scores/route.ts`: (Internal) Handles the persistence of reading scores via Prisma ORM.
 

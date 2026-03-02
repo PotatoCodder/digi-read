@@ -8,7 +8,7 @@ import FeaturesShowcase from '@/components/layout/featureShowcase'
 import TestimonialsSection from '@/components/layout/tesemonials'
 
 export default function ReadPage() {
-  const [selectedClass, setSelectedClass] = useState<'English' | 'Tagalog' | null>(null)
+  const [selectedClass, setSelectedClass] = useState<'English' | 'Filipino' | null>(null)
 
   if (selectedClass) {
     const passageId = selectedClass === 'English' ? 'telling-time' : 'karapatang-sibil';
@@ -56,13 +56,28 @@ export default function ReadPage() {
                 <IoBook className="w-32 h-32" />
               </div>
 
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
-                <span className="text-3xl">🇬🇧</span>
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner overflow-hidden border border-blue-200">
+                <svg viewBox="0 0 741 390" className="w-full h-full object-cover">
+                  <path d="M0 0h741v390H0z" fill="#fff" />
+                  <path d="M0 0h741v30H0zm0 60h741v30H0zm0 60h741v30H0zm0 60h741v30H0zm0 60h741v30H0zm0 60h741v30H0zm0 60h741v30H0z" fill="#b22234" />
+                  <path d="M0 0h296.4v210H0z" fill="#3c3b6e" />
+                  <g fill="#fff">
+                    <g id="j">
+                      <g id="k">
+                        <path id="l" d="M24.7 6.5l.6 2h2.1l-1.7 1.2.6 2-1.7-1.2-1.7 1.2.6-2-1.7-1.2h2.1z" />
+                        <use href="#l" x="49.4" /><use href="#l" x="98.8" /><use href="#l" x="148.2" /><use href="#l" x="197.6" />
+                      </g>
+                      <use href="#k" x="24.7" y="21" />
+                    </g>
+                    <use href="#j" y="42" /><use href="#j" y="84" /><use href="#j" y="126" />
+                    <use href="#k" y="168" />
+                  </g>
+                </svg>
               </div>
 
               <h2 className="text-2xl font-bold text-slate-900 mb-3">English Class</h2>
               <p className="text-slate-600 mb-6 min-h-[48px]">
-                Practice reading in English. Improve your pronunciation, fluency, and comprehension.
+                Practice reading in English <span className="text-blue-600 font-semibold">(British accent)</span>. Improve your pronunciation, fluency, and comprehension.
               </p>
 
               <div className="flex items-center text-blue-600 font-medium group-hover:gap-2 transition-all">
@@ -71,24 +86,32 @@ export default function ReadPage() {
               </div>
             </motion.div>
 
-            {/* Tagalog Class Card */}
+            {/* Filipino Class Card */}
             <motion.div
               whileHover={{ scale: 1.02, translateY: -5 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => setSelectedClass('Tagalog')}
+              onClick={() => setSelectedClass('Filipino')}
               className="cursor-pointer bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden relative"
             >
               <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-500">
                 <IoLanguage className="w-32 h-32" />
               </div>
 
-              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
-                <span className="text-3xl">🇵🇭</span>
+              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner overflow-hidden border border-amber-200">
+                <svg viewBox="0 0 900 600" className="w-full h-full object-cover">
+                  <path d="M0 0h900v300H0z" fill="#0038a8" />
+                  <path d="M0 300h900v300H0z" fill="#ce1126" />
+                  <path d="M0 0l450 300L0 600z" fill="#fff" />
+                  <g fill="#fcd116">
+                    <circle cx="150" cy="300" r="50" />
+                    <path d="M150 210l10 30-10 10-10-10zM150 390l10-30-10-10-10 10zM240 300l-30 10-10-10 10-10zM60 300l30 10 10-10-10-10zM214 236l-15 26-14 1 1-14zM86 364l15-26 14-1-1 14zM214 364l-26-15-1-14 14 1zM86 236l26 15 1 14-14-1z" />
+                  </g>
+                </svg>
               </div>
 
-              <h2 className="text-2xl font-bold text-slate-900 mb-3">Tagalog Class</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-3">Filipino Class</h2>
               <p className="text-slate-600 mb-6 min-h-[48px]">
-                Magsanay sa pagbabasa sa wikang Tagalog. Pagbutihin ang iyong pagbigkas at pag-unawa.
+                Magsanay sa pagbabasa sa wikang Filipino. Pagbutihin ang iyong pagbigkas at pag-unawa.
               </p>
 
               <div className="flex items-center text-amber-600 font-medium group-hover:gap-2 transition-all">
