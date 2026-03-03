@@ -56,8 +56,9 @@ export default function ReadPage() {
                 <IoBook className="w-32 h-32" />
               </div>
 
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner overflow-hidden border border-blue-200">
-                <svg viewBox="0 0 741 390" className="w-full h-full object-cover">
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6 shadow-inner overflow-hidden border border-blue-200 relative">
+                {/* US Flag */}
+                <svg viewBox="0 0 741 390" className="w-[60%] h-[60%] object-cover absolute top-2 left-2 rounded-sm border border-white/50 shadow-sm z-10">
                   <path d="M0 0h741v390H0z" fill="#fff" />
                   <path d="M0 0h741v30H0zm0 60h741v30H0zm0 60h741v30H0zm0 60h741v30H0zm0 60h741v30H0zm0 60h741v30H0zm0 60h741v30H0z" fill="#b22234" />
                   <path d="M0 0h296.4v210H0z" fill="#3c3b6e" />
@@ -73,11 +74,22 @@ export default function ReadPage() {
                     <use href="#k" y="168" />
                   </g>
                 </svg>
+                {/* UK Flag */}
+                <svg viewBox="0 0 60 30" className="w-[60%] h-[60%] object-cover absolute bottom-2 right-2 rounded-sm border border-white/50 shadow-sm">
+                  <clipPath id="s">
+                    <path d="M0,0 v30 h60 v-30 z" />
+                  </clipPath>
+                  <path d="M0,0 v30 h60 v-30 z" fill="#012169" />
+                  <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6" />
+                  <path d="M0,0 L60,30 M60,0 L0,30" clipPath="url(#s)" stroke="#C8102E" strokeWidth="4" />
+                  <path d="M30,0 v30 M0,15 h60" stroke="#fff" strokeWidth="10" />
+                  <path d="M30,0 v30 M0,15 h60" stroke="#C8102E" strokeWidth="6" />
+                </svg>
               </div>
 
               <h2 className="text-2xl font-bold text-slate-900 mb-3">English Class</h2>
               <p className="text-slate-600 mb-6 min-h-[48px]">
-                Practice reading in English <span className="text-blue-600 font-semibold">(British accent)</span>. Improve your pronunciation, fluency, and comprehension.
+                Practice reading in English <span className="text-blue-600 font-semibold">(British English accent)</span>. Improve your pronunciation, fluency, and comprehension.
               </p>
 
               <div className="flex items-center text-blue-600 font-medium group-hover:gap-2 transition-all">

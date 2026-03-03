@@ -51,7 +51,7 @@ export default function ResultsPage() {
 
     const getReadingLevel = (score: number) => {
         if (score >= 90) return {
-            level: 'Independent',
+            level: 'Advanced',
             color: 'text-emerald-600',
             bg: 'bg-emerald-50',
             border: 'border-emerald-100',
@@ -59,7 +59,7 @@ export default function ResultsPage() {
             gradient: 'from-emerald-500 to-emerald-600'
         }
         if (score >= 51) return {
-            level: 'Instructional',
+            level: 'Developing',
             color: 'text-sky-600',
             bg: 'bg-sky-50',
             border: 'border-sky-100',
@@ -67,7 +67,7 @@ export default function ResultsPage() {
             gradient: 'from-sky-500 to-sky-600'
         }
         return {
-            level: 'Frustrated',
+            level: 'Beginner',
             color: 'text-amber-600',
             bg: 'bg-amber-50',
             border: 'border-amber-100',
@@ -140,6 +140,11 @@ export default function ResultsPage() {
                         const level = getReadingLevel(item.finalAccuracy)
                         const progress = Math.round((item.finalWordsRead / item.totalWords) * 100)
 
+                        // Calculate counts
+                        const correctCount = item.wordStatuses.filter(s => s === 'correct').length
+                        const wrongCount = item.wordStatuses.filter(s => s === 'wrong').length
+                        const missedCount = item.totalWords - item.finalWordsRead
+
                         return (
                             <motion.div
                                 key={`${item.date}-${index}`}
@@ -193,10 +198,20 @@ export default function ResultsPage() {
                                             </div>
                                         </div>
 
-                                        <div className="text-right hidden sm:block">
-                                            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Words</div>
-                                            <div className="text-base font-black text-slate-900">
-                                                {item.finalWordsRead}/{item.totalWords}
+                                        <div className="text-right hidden sm:block border-l border-slate-100 pl-4">
+                                            <div className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-1.5">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                    <span className="text-[10px] font-black text-slate-400">{correctCount}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                                                    <span className="text-[10px] font-black text-slate-400">{wrongCount}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                                                    <span className="text-[10px] font-black text-slate-400">{missedCount}</span>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -241,6 +256,22 @@ export default function ResultsPage() {
                                                             <p className="mt-4 text-xs font-bold text-slate-600 leading-relaxed italic">
                                                                 "{item.finalAccuracy >= 90 ? "Native-like fluency achieved!" : item.finalAccuracy >= 50 ? "Consistent pacing, room for clarity." : "Slow down and focus on enunciation."}"
                                                             </p>
+                                                        </div>
+
+                                                        {/* Detailed Stats Row */}
+                                                        <div className="grid grid-cols-3 gap-3">
+                                                            <div className="bg-emerald-50/50 p-3 rounded-2xl border border-emerald-100 flex flex-col items-center">
+                                                                <span className="text-[10px] font-black text-emerald-600 uppercase mb-1">Correct</span>
+                                                                <span className="text-lg font-black text-emerald-700">{correctCount}</span>
+                                                            </div>
+                                                            <div className="bg-red-50/50 p-3 rounded-2xl border border-red-100 flex flex-col items-center">
+                                                                <span className="text-[10px] font-black text-red-600 uppercase mb-1">Wrong</span>
+                                                                <span className="text-lg font-black text-red-700">{wrongCount}</span>
+                                                            </div>
+                                                            <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col items-center">
+                                                                <span className="text-[10px] font-black text-slate-400 uppercase mb-1">Missed</span>
+                                                                <span className="text-lg font-black text-slate-500">{missedCount}</span>
+                                                            </div>
                                                         </div>
 
                                                         {/* Summary Row */}
